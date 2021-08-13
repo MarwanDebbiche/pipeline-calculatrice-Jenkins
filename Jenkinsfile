@@ -8,10 +8,9 @@ pipeline {
                 }
             }
             steps {
+                echo 'Branch name : ${BRANCH_NAME}'
+                echo 'Author : ${CHANGE_AUTHOR_DISPLAY_NAME}'
                 sh 'python3.8 -m py_compile sources/prog.py sources/calc.py'
-                sh 'echo "Hello world"' 
-                sh 'echo $BRANCH_NAME'
-                sh 'echo $CHANGE_AUTHOR_DISPLAY_NAME'
                 stash(name: 'compiled-results', includes: 'sources/*.py*')
             }
         }
