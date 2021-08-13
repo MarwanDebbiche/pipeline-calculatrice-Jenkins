@@ -8,8 +8,8 @@ pipeline {
                 }
             }
             steps {
-                echo "Branch name : ${BRANCH_NAME}"
-                echo "Author : ${CHANGE_AUTHOR_DISPLAY_NAME}"
+                echo "Branch name : ${env.BRANCH_NAME}"
+                echo "Author : ${env.CHANGE_AUTHOR_DISPLAY_NAME}"
                 sh 'python3.8 -m py_compile sources/prog.py sources/calc.py'
                 stash(name: 'compiled-results', includes: 'sources/*.py*')
             }
