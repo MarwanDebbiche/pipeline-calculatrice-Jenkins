@@ -10,6 +10,8 @@ pipeline {
             steps {
                 sh 'python3.8 -m py_compile sources/prog.py sources/calc.py'
                 sh 'echo "Hello world"' 
+                sh 'echo $BRANCH_NAME'
+                sh 'echo $CHANGE_AUTHOR_DISPLAY_NAME'
                 stash(name: 'compiled-results', includes: 'sources/*.py*')
             }
         }
@@ -28,5 +30,25 @@ pipeline {
                 }
             }
         }
+        stage('Deliver') {
+            agent any
+            environment {
+                VOLUME = '$(pwd)/sources:/src'
+                IMAGE = 'cdrx/pyinstaller-linux'
+            }
+            steps {
+                dir(path: env.BUILD_ID) {
+                    unstash(name: 'compiled-results')
+                    sh "docker run --rm -v ${VOLUME} ${IMAGE} 'pyinstaller -F prog.py'"
+                }
+            }
+            post {
+                success {
+                    archiveArtifacts "${env.BUILD_ID}/sources/dist/prog"
+                    sh "docker run --rm -v ${VOLUME} ${IMAGE} 'rm -rf build dist'"
+                }
+            }
+        }
+
     }
 }
